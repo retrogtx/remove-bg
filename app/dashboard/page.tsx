@@ -1,20 +1,9 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { 
-  Sidebar, 
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarInset
-} from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Upload, Home, Settings, LogOut } from "lucide-react"
-import { signOut } from "@/auth"
+import { Upload } from "lucide-react"
+import { AppSidebar } from "@/components/app-sidebar"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -26,59 +15,7 @@ export default async function DashboardPage() {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen bg-background">
-        <div className="fixed left-4 top-4 z-50 lg:hidden">
-          <SidebarTrigger />
-        </div>
-
-        <Sidebar>
-          <SidebarHeader className="border-b border-border">
-            <div className="flex items-center gap-2 px-4 py-2">
-              <span className="hidden lg:block">
-                <SidebarTrigger />
-              </span>
-              <span className="font-semibold">Video Magic</span>
-            </div>
-          </SidebarHeader>
-
-          <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Home">
-                  <Home className="h-4 w-4" />
-                  <span>Home</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Upload">
-                  <Upload className="h-4 w-4" />
-                  <span>Upload Video</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Settings">
-                  <Settings className="h-4 w-4" />
-                  <span>Settings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-
-          <SidebarFooter className="border-t border-border p-4">
-            <form
-              action={async () => {
-                "use server"
-                await signOut()
-              }}
-            >
-              <SidebarMenuButton className="w-full" tooltip="Sign Out">
-                <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
-              </SidebarMenuButton>
-            </form>
-          </SidebarFooter>
-        </Sidebar>
+        <AppSidebar />
 
         <SidebarInset>
           <div className="container mx-auto p-6">
