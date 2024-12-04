@@ -26,10 +26,16 @@ export default async function DashboardPage() {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen bg-background">
+        <div className="fixed left-4 top-4 z-50 lg:hidden">
+          <SidebarTrigger />
+        </div>
+
         <Sidebar>
           <SidebarHeader className="border-b border-border">
             <div className="flex items-center gap-2 px-4 py-2">
-              <SidebarTrigger />
+              <span className="hidden lg:block">
+                <SidebarTrigger />
+              </span>
               <span className="font-semibold">Video Magic</span>
             </div>
           </SidebarHeader>
