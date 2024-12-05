@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { VideoUploader } from "@/components/video-uploader"
+import { VideoList } from "@/components/video-list"
 import { AppSidebar } from "@/components/app-sidebar"
 import { createBucketIfNotExists } from "@/lib/supabase-admin"
 
@@ -10,7 +11,7 @@ export default async function DashboardPage() {
     redirect('/')
   }
 
-  // Create bucket on page load
+  // Create bucket if it doesn't exist
   await createBucketIfNotExists()
   
   return (
@@ -22,7 +23,10 @@ export default async function DashboardPage() {
           <p className="text-muted-foreground">Upload videos and remove backgrounds</p>
         </div>
         
-        <VideoUploader />
+        <div className="space-y-10">
+          <VideoUploader />
+          <VideoList />
+        </div>
       </main>
     </div>
   )

@@ -16,8 +16,12 @@ export async function createBucketIfNotExists() {
   
   if (!buckets?.find(b => b.name === 'upload')) {
     await supabaseAdmin.storage.createBucket('upload', {
-      public: false,
+      public: true,
       fileSizeLimit: 100 * 1024 * 1024 // 100MB
+    })
+  } else {
+    await supabaseAdmin.storage.updateBucket('upload', {
+      public: true
     })
   }
 } 

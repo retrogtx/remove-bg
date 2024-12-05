@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { db } from "@/prisma"
 import { NextResponse } from "next/server"
+import { headers } from 'next/headers'
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +49,19 @@ export async function POST(req: Request) {
         }
       }
     })
+
+    const headersList = await headers()
+    const host = headersList.get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+
+    // Trigger processing with absolute URL
+    fetch(`${protocol}://${host}/api/process`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ jobId: job.id }),
+    }).catch(console.error)
 
     return NextResponse.json({ 
       jobId: job.id,
