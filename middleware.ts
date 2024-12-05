@@ -1,22 +1,25 @@
-import { auth } from "@/auth"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { auth } from "@/auth"
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const isOnAuthPage = req.nextUrl.pathname === "/"
-  const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard")
+export async function middleware(request: NextRequest) {
+  const session = await auth()
 
-  if (isLoggedIn && isOnAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/signin', request.url))
   }
 
-  if (!isLoggedIn && isOnDashboard) {
-    return NextResponse.redirect(new URL("/", req.url))
+  if (session && request.nextUrl.pathname === '/signin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
+  if (session && request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+  
   return NextResponse.next()
-})
+}
 
 export const config = {
-  matcher: ['/', '/dashboard/:path*']
+  matcher: ["/dashboard/:path*", "/signin", "/"],
 }
