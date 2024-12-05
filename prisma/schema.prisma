@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-  output   = "./generated/client"
+  previewFeatures = ["driverAdapters", "clientExtensions"]
 }
 
 datasource db {
@@ -48,6 +47,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  jobs          Job[]
  
   @@map("users")
 }
@@ -59,4 +59,22 @@ model VerificationToken {
  
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model Job {
+  id            String   @id @default(cuid())
+  userId        String
+  fileName      String
+  filePath      String
+  processedPath String?
+  fileSize      Int
+  status        String   @default("pending")
+  error         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("jobs")
 }
