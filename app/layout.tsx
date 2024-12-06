@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Magic Video - AI Video Background Removal',
+  title: 'Scene AI - AI Video Background Removal',
   description: 'Remove video backgrounds instantly with AI-powered precision. Perfect for creators, marketers, and professionals.',
 };
 
