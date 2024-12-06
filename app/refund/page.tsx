@@ -10,7 +10,7 @@ export default function RefundPage() {
             Due to the immediate processing nature of our AI video background removal service, we maintain a strict no-refund policy. Once a video has been processed, the computational resources have been consumed and cannot be recovered.
           </p>
 
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Why We Don't Offer Refunds</h2>
+          <h2 className="text-2xl font-semibold mt-8 mb-4">Why We Don&apos;t Offer Refunds</h2>
           <ul className="text-gray-300 mb-4 list-disc pl-6 space-y-2">
             <li>Our service provides immediate, real-time processing of your videos</li>
             <li>Computing resources are allocated and consumed instantly</li>
