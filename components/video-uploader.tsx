@@ -24,7 +24,7 @@ export function VideoUploader() {
     setIsDragging(false)
   }, [])
 
-  const validateVideo = (file: File) => {
+  const validateVideo = useCallback((file: File) => {
     const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
     
     if (!file.type.startsWith('video/')) {
@@ -46,7 +46,7 @@ export function VideoUploader() {
     }
 
     return true
-  }
+  }, [toast])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -57,7 +57,7 @@ export function VideoUploader() {
 
     if (!videoFile || !validateVideo(videoFile)) return
     setUploadedVideo(videoFile)
-  }, [toast])
+  }, [validateVideo])
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -65,7 +65,7 @@ export function VideoUploader() {
 
     if (!videoFile || !validateVideo(videoFile)) return
     setUploadedVideo(videoFile)
-  }, [toast])
+  }, [validateVideo])
 
   const handleUpload = async () => {
     if (!uploadedVideo) return
