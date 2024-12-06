@@ -18,6 +18,7 @@ export function VideoList() {
 
   useEffect(() => {
     fetchJobs()
+    // Refresh every 5 seconds
     const interval = setInterval(fetchJobs, 5000)
     return () => clearInterval(interval)
   }, [])
@@ -33,7 +34,6 @@ export function VideoList() {
   const getVideoUrl = (path: string) => {
     if (!path) return ''
     const { data } = supabase.storage.from('upload').getPublicUrl(path)
-    console.log('Video URL for path:', path, 'is:', data.publicUrl)
     return data.publicUrl
   }
 
@@ -73,7 +73,6 @@ export function VideoList() {
                     src={getVideoUrl(job.filePath)}
                     controls
                     className="w-full rounded"
-                    onError={(e) => console.error('Video error:', e)}
                   />
                 )}
               </div>

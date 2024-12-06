@@ -2,7 +2,10 @@ import { auth } from "@/auth"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { db } from "@/prisma"
 import { NextResponse } from "next/server"
-import { headers } from 'next/headers'
+
+// Constants
+const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
 
 export async function POST(req: Request) {
   try {
@@ -14,28 +17,27 @@ export async function POST(req: Request) {
     const formData = await req.formData()
     const file = formData.get("file") as File
     
-    if (!file) {
-      return new NextResponse("No file provided", { status: 400 })
+    // Validate file
+    if (!file || !ALLOWED_TYPES.includes(file.type)) {
+      return new NextResponse("Invalid file type", { status: 400 })
     }
 
-    // Generate a unique file path
-    const fileName = `${session.user.id}/${Date.now()}-${file.name}`
+    if (file.size > MAX_FILE_SIZE) {
+      return new NextResponse("File too large (max 100MB)", { status: 400 })
+    }
 
-    // Upload directly to Supabase bucket
-    const { data, error: storageError } = await supabaseAdmin
+    // 1. Upload original video to Supabase
+    const fileName = `${session.user.id}/${Date.now()}-${file.name}`
+    const { data, error } = await supabaseAdmin
       .storage
       .from('upload')
-      .upload(fileName, file, {
-        contentType: file.type,
-        upsert: true
-      })
+      .upload(fileName, file)
 
-    if (storageError || !data) {
-      console.error('Storage error:', storageError)
-      return new NextResponse("Upload failed: " + storageError.message, { status: 500 })
+    if (error) {
+      return new NextResponse(error.message, { status: 500 })
     }
 
-    // Create job record
+    // 2. Create job record
     const job = await db.job.create({
       data: {
         fileName: file.name,
@@ -50,25 +52,21 @@ export async function POST(req: Request) {
       }
     })
 
-    const headersList = await headers()
-    const host = headersList.get('host')
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    // Get the request URL to determine the origin
+    const origin = new URL(req.url).origin
 
-    // Trigger processing with absolute URL
-    fetch(`${protocol}://${host}/api/process`, {
+    // 3. Start processing
+    fetch(`${origin}/api/process`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ jobId: job.id }),
+      body: JSON.stringify({ jobId: job.id })
     }).catch(console.error)
 
-    return NextResponse.json({ 
-      jobId: job.id,
-      path: data.path
-    })
-  } catch (error) {
-    console.error('Upload error:', error)
-    return new NextResponse(error instanceof Error ? error.message : "Internal error", { status: 500 })
+    return NextResponse.json({ success: true, jobId: job.id })
+  } catch (err) {
+    const error = err as Error
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 } 

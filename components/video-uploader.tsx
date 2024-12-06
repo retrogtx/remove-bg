@@ -7,6 +7,22 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 
+interface Job {
+  id: string
+  fileName: string
+  filePath: string
+  processedPath: string | null
+  fileSize: number
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  error: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+interface JobsResponse {
+  jobs: Job[]
+}
+
 export function VideoUploader() {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
@@ -69,20 +85,46 @@ export function VideoUploader() {
 
   const handleUpload = async () => {
     if (!uploadedVideo) return
-
+    
     try {
       setIsUploading(true)
+      
+      // Check if video is already in processing
+      const jobsResponse = await fetch('/api/jobs')
+      if (!jobsResponse.ok) {
+        throw new Error(await jobsResponse.text())
+      }
+      
+      const { jobs } = (await jobsResponse.json()) as JobsResponse
+      
+      const isDuplicate = jobs.some(job => 
+        job.fileName === uploadedVideo.name && 
+        ['pending', 'processing'].includes(job.status)
+      )
+
+      if (isDuplicate) {
+        toast({
+          title: "Duplicate Upload",
+          description: "This video is already being processed",
+          variant: "destructive",
+        })
+        return
+      }
+
       const formData = new FormData()
       formData.append("file", uploadedVideo)
 
-      const response = await fetch("/api/upload", {
+      const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error(await response.text())
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text()
+        throw new Error(errorText || 'Upload failed')
       }
+
+      const result = await uploadResponse.json()
 
       toast({
         title: "Upload successful",
