@@ -1,11 +1,7 @@
 "use client"
 
-// Inspired by react-hot-toast library
 import * as React from "react"
 
-import type { ToasterToast } from "@/components/ui/toast"
-
-const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
 type ToastActionElement = React.ReactElement<{
@@ -20,13 +16,6 @@ type ToastProps = {
   variant?: "default" | "destructive"
 }
 
-const actionTypes = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST",
-} as const
-
 let count = 0
 
 function genId() {
@@ -34,33 +23,13 @@ function genId() {
   return count.toString()
 }
 
-type ActionType = typeof actionTypes
-
-type Action =
-  | {
-      type: ActionType["ADD_TOAST"]
-      toast: ToastProps
-    }
-  | {
-      type: ActionType["UPDATE_TOAST"]
-      toast: Partial<ToastProps>
-    }
-  | {
-      type: ActionType["DISMISS_TOAST"]
-      toastId?: ToastProps["id"]
-    }
-  | {
-      type: ActionType["REMOVE_TOAST"]
-      toastId?: ToastProps["id"]
-    }
-
 interface State {
   toasts: ToastProps[]
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-const addToRemoveQueue = (toastId: string) => {
+const addToRemoveQueue = (toastId: string, dispatch: (value: { type: "REMOVE_TOAST", toastId: string }) => void) => {
   if (toastTimeouts.has(toastId)) {
     return
   }
@@ -81,27 +50,31 @@ export function useToast() {
     toasts: [],
   })
 
+  const dispatch = React.useCallback((action: { type: "REMOVE_TOAST", toastId: string }) => {
+    if (action.type === "REMOVE_TOAST") {
+      setState((state) => ({
+        ...state,
+        toasts: state.toasts.filter((t) => t.id !== action.toastId),
+      }))
+    }
+  }, [])
+
   React.useEffect(() => {
     state.toasts.forEach((toast) => {
       if (toast.id && !toastTimeouts.has(toast.id)) {
-        addToRemoveQueue(toast.id)
+        addToRemoveQueue(toast.id, dispatch)
       }
     })
-  }, [state.toasts])
+  }, [state.toasts, dispatch])
 
   return {
     toasts: state.toasts,
     toast: (props: Omit<ToastProps, "id">) => {
       const id = genId()
-
       setState((state) => ({
         ...state,
-        toasts: [
-          ...state.toasts,
-          { ...props, id },
-        ],
+        toasts: [...state.toasts, { ...props, id }],
       }))
-
       return id
     },
     dismiss: (toastId?: string) => {
