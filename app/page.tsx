@@ -1,4 +1,5 @@
 import SignIn from '@/components/sign-in';
+import { Footer } from '@/components/footer';
 
 export default function Home() {
   return (
@@ -43,6 +44,8 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
