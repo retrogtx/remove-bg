@@ -128,7 +128,7 @@ export function VideoUploader() {
 
       toast({
         title: "Upload successful",
-        description: "Your video is being processed",
+        description: `Your video is being processed (Job #${result.jobId})`,
       })
 
       // Reset state
