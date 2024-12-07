@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { db } from "@/prisma"
 import { NextResponse } from "next/server"
@@ -19,11 +18,6 @@ type SupabaseUploadResponse = {
 
 export async function POST(req: Request) {
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return new NextResponse("Unauthorized", { status: 401 })
-    }
-
     const { jobId } = await req.json()
     if (!jobId) {
       return new NextResponse("Job ID is required", { status: 400 })

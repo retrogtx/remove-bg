@@ -10,8 +10,19 @@ const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
 export async function POST(req: Request) {
   try {
     const session = await auth()
-    if (!session?.user) {
+    console.log('Session:', session) // Debug session
+
+    if (!session) {
       return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    if (!session.user) {
+      return new NextResponse("No user found", { status: 401 })
+    }
+
+    const userId = session.user.id
+    if (!userId) {
+      return new NextResponse("No user ID found", { status: 401 })
     }
 
     const formData = await req.formData()
@@ -27,14 +38,19 @@ export async function POST(req: Request) {
     }
 
     // 1. Upload original video to Supabase
-    const fileName = `${session.user.id}/${Date.now()}-${file.name}`
+    const fileName = `${userId}/${Date.now()}-${file.name}`
     const { data, error } = await supabaseAdmin
       .storage
       .from('upload')
       .upload(fileName, file)
 
     if (error) {
+      console.error('Supabase upload error:', error)
       return new NextResponse(error.message, { status: 500 })
+    }
+
+    if (!data?.path) {
+      return new NextResponse("Upload failed: No file path", { status: 500 })
     }
 
     // 2. Create job record
@@ -46,7 +62,7 @@ export async function POST(req: Request) {
         status: 'pending',
         user: {
           connect: {
-            id: session.user.id
+            id: userId
           }
         }
       }
@@ -56,15 +72,29 @@ export async function POST(req: Request) {
     const origin = new URL(req.url).origin
 
     // 3. Start processing
-    fetch(`${origin}/api/process`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ jobId: job.id })
-    }).catch(console.error)
+    try {
+      const processResponse = await fetch(`${origin}/api/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ jobId: job.id })
+      })
 
-    return NextResponse.json({ success: true, jobId: job.id })
+      if (!processResponse.ok) {
+        const errorText = await processResponse.text()
+        console.error('Process request failed:', processResponse.status, errorText)
+        return new NextResponse(`Failed to start processing: ${errorText}`, { 
+          status: processResponse.status 
+        })
+      }
+
+      // Processing started successfully
+      return NextResponse.json({ success: true, jobId: job.id })
+    } catch (error) {
+      console.error('Failed to start processing:', error)
+      return new NextResponse('Failed to start processing', { status: 500 })
+    }
   } catch (err) {
     const error = err as Error
     return NextResponse.json({ error: error.message }, { status: 500 })

@@ -34,23 +34,25 @@ export default function Home() {
             Professional-grade AI that works with any video, no setup required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button 
-              size="lg" 
-              className={cn(
-                "text-lg relative overflow-hidden group",
-                "bg-gradient-to-r from-blue-600 to-blue-500",
-                "hover:from-blue-500 hover:to-blue-600",
-                "border border-blue-500/20 hover:border-blue-500/50",
-                "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-                "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
-                "transition-all duration-300"
-              )}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
-                translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-              <SignIn />
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <SignIn>
+              <Button 
+                size="lg" 
+                className={cn(
+                  "text-lg relative overflow-hidden group",
+                  "bg-gradient-to-r from-blue-600 to-blue-500",
+                  "hover:from-blue-500 hover:to-blue-600",
+                  "border border-blue-500/20 hover:border-blue-500/50",
+                  "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
+                  "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
+                  "transition-all duration-300"
+                )}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
+                  translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+                Sign In
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </SignIn>
             <span className="text-gray-400">Free credits to get started</span>
           </div>
         </div>
@@ -121,23 +123,25 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Join creators who trust Scene AI for professional background removal.
           </p>
-          <Button 
-            size="lg" 
-            className={cn(
-              "text-lg relative overflow-hidden group",
-              "bg-gradient-to-r from-blue-600 to-blue-500",
-              "hover:from-blue-500 hover:to-blue-600",
-              "border border-blue-500/20 hover:border-blue-500/50",
-              "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-              "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
-              "transition-all duration-300"
-            )}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
-              translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-            <SignIn />
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <SignIn>
+            <Button 
+              size="lg" 
+              className={cn(
+                "text-lg relative overflow-hidden group",
+                "bg-gradient-to-r from-blue-600 to-blue-500",
+                "hover:from-blue-500 hover:to-blue-600",
+                "border border-blue-500/20 hover:border-blue-500/50",
+                "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
+                "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
+                "transition-all duration-300"
+              )}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
+                translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+              Sign In
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </SignIn>
         </div>
       </main>
 
