@@ -16,12 +16,6 @@ type SupabaseUploadResponse = {
   path: string
 }
 
-// Add type for Replicate response
-type ReplicateResponse = {
-  output: string
-  error?: string
-  // Add other fields if needed
-}
 
 export async function POST(req: Request) {
   try {
@@ -57,32 +51,43 @@ export async function POST(req: Request) {
         .from('upload')
         .getPublicUrl(job.filePath)
 
-      console.log('Processing video from URL:', publicUrl) // Debug log
+      console.log('Processing video from URL:', publicUrl)
 
-      // Process with Replicate - simplified input structure
-      const result = await replicate.run(
-        "arielreplicate/robust_video_matting:73d2128a371922d5d1abf0712a1d974be0e4e2358cc1218e4e34714767232bac",
-        {
-          input: {
-            input_video: publicUrl
-          }
-        }
-      ) as ReplicateResponse
+      // Start the prediction and wait for completion
+      const prediction = await replicate.predictions.create({
+        version: "73d2128a371922d5d1abf0712a1d974be0e4e2358cc1218e4e34714767232bac",
+        input: {
+          input_video: publicUrl
+        },
+      })
 
-      console.log('Replicate output:', result) // Debug log
-
-      // Check for errors in the response
-      if (!result || result.error) {
-        throw new Error(result.error || 'No output from Replicate')
+      // Wait for the prediction to complete
+      let result = await replicate.predictions.get(prediction.id)
+      while (result.status === "processing" || result.status === "starting") {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        result = await replicate.predictions.get(prediction.id)
       }
 
-      // Download the processed video from Replicate using the output URL
+      if (result.status !== "succeeded") {
+        console.error('Replicate processing failed:', result)
+        throw new Error(`Prediction failed: ${result.error || 'Unknown error'}`)
+      }
+
+      console.log('Replicate processing succeeded:', result)
+
+      // Download the processed video from Replicate
       const response = await fetch(result.output)
       if (!response.ok) {
-        throw new Error('Failed to download processed video')
+        throw new Error(`Failed to download processed video: ${response.statusText}`)
       }
 
       const videoBuffer = Buffer.from(await response.arrayBuffer())
+      
+      // Verify buffer
+      if (!videoBuffer.length) {
+        throw new Error('Received empty video buffer from Replicate')
+      }
+      console.log('Video buffer size:', videoBuffer.length)
 
       // Upload to Supabase
       const processedFileName = `processed/${job.id}/${job.fileName}`
@@ -91,19 +96,30 @@ export async function POST(req: Request) {
         .from('upload')
         .upload(processedFileName, videoBuffer, {
           contentType: 'video/mp4',
-          upsert: true
+          upsert: true,
+          duplex: 'half',
+          headers: {
+            'Content-Length': videoBuffer.length.toString()
+          }
         })
 
-      if (uploadError || !uploadData) {
-        throw new Error(`Failed to upload processed video: ${uploadError?.message || 'No upload data'}`)
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError)
+        throw new Error(`Failed to upload processed video: ${uploadError.message}`)
       }
+
+      if (!uploadData) {
+        throw new Error('No upload data received from Supabase')
+      }
+
+      console.log('Successfully uploaded to Supabase:', uploadData)
 
       return uploadData
     }
 
-    // Add timeout handling - 5 minutes
+    // Add timeout handling - 30 minutes
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Processing timeout after 5 minutes')), 300000)
+      setTimeout(() => reject(new Error('Processing timeout after 30 minutes')), 1800000)
     })
 
     try {

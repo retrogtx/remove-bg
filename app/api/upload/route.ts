@@ -4,7 +4,7 @@ import { db } from "@/prisma"
 import { NextResponse } from "next/server"
 
 // Constants
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024
 const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
 
 export async function POST(req: Request) {
