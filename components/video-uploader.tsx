@@ -123,8 +123,6 @@ export function VideoUploader() {
         throw new Error(await uploadResponse.text())
       }
 
-      const { jobId } = await uploadResponse.json()
-
       toast({
         title: "Upload successful",
         description: "Your video is being processed. You can check its status in the video list.",
