@@ -114,21 +114,20 @@ export function VideoUploader() {
       const formData = new FormData()
       formData.append("file", uploadedVideo)
 
-      const uploadResponse = await fetch("/api/upload", {
+      const uploadResponse = await fetch("/api/process", {
         method: "POST",
         body: formData,
       })
 
       if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text()
-        throw new Error(errorText || 'Upload failed')
+        throw new Error(await uploadResponse.text())
       }
 
-      const result = await uploadResponse.json()
+      const { jobId } = await uploadResponse.json()
 
       toast({
         title: "Upload successful",
-        description: `Your video is being processed (Job #${result.jobId})`,
+        description: "Your video is being processed. You can check its status in the video list.",
       })
 
       // Reset state

@@ -116,7 +116,18 @@ export function VideoList() {
             </div>
 
             {job.status === 'processing' && (
-              <Progress value={30} className="mb-2" />
+              <div className="space-y-2">
+                <Progress value={undefined} className="mb-2" />
+                <p className="text-sm text-muted-foreground text-center">
+                  Processing your video... This may take a few minutes
+                </p>
+              </div>
+            )}
+
+            {job.status === 'pending' && (
+              <p className="text-sm text-muted-foreground text-center">
+                Waiting to start processing...
+              </p>
             )}
 
             {job.error && (
