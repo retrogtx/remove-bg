@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react'
 import { Progress } from "@/components/ui/progress"
 import { supabase } from '@/lib/supabase'
+import { useToast } from "@/hooks/use-toast"
+import { useMutation } from "@tanstack/react-query"
+import { Button } from "@/components/ui/button"
+
+interface JobsResponse {
+  jobs: Job[]
+}
 
 type Job = {
   id: string
@@ -15,6 +22,25 @@ type Job = {
 
 export function VideoList() {
   const [jobs, setJobs] = useState<Job[]>([])
+  const { toast } = useToast()
+  const { mutate } = useMutation<JobsResponse, Error>({
+    mutationFn: async () => {
+      const response = await fetch('/api/jobs')
+      if (!response.ok) throw new Error('Failed to fetch jobs')
+      return response.json() as Promise<JobsResponse>
+    },
+    onSuccess: (data: JobsResponse) => {
+      setJobs(data.jobs)
+    },
+    onError: (error: Error) => {
+      console.error('Error fetching jobs:', error)
+      toast({
+        title: "Error fetching jobs",
+        description: error.message || "Please try again",
+        variant: "destructive",
+      })
+    },
+  })
 
   useEffect(() => {
     fetchJobs()
@@ -37,9 +63,43 @@ export function VideoList() {
     return data.publicUrl
   }
 
+  const handleRecoverJobs = async () => {
+    try {
+      const response = await fetch('/api/jobs/recover', {
+        method: 'POST'
+      })
+      
+      if (!response.ok) {
+        throw new Error(await response.text())
+      }
+
+      const result = await response.json()
+      
+      toast({
+        title: "Recovery Complete",
+        description: `Recovered ${result.recoveredJobs.length} jobs`,
+      })
+
+      // Refresh the jobs list
+      mutate()
+    } catch (error) {
+      console.error('Recovery failed:', error)
+      toast({
+        title: "Recovery failed",
+        description: error instanceof Error ? error.message : "Please try again",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Your Videos</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Your Videos</h2>
+        <Button onClick={handleRecoverJobs} variant="outline">
+          Recover Failed Jobs
+        </Button>
+      </div>
       
       <div className="grid gap-6">
         {jobs.map(job => (
