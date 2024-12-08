@@ -11,7 +11,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold">Scene AI</div>
           <div className="space-x-4">
-            <SignIn />
+            <SignIn>Sign In</SignIn>
           </div>
         </div>
       </nav>
@@ -34,22 +34,21 @@ export default function Home() {
             Professional-grade AI that works with any video, no setup required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button 
-              size="lg" 
+            <SignIn 
               className={cn(
-                "text-lg relative overflow-hidden group",
                 "bg-gradient-to-r from-blue-600 to-blue-500",
                 "hover:from-blue-500 hover:to-blue-600",
-                "border border-blue-500/20 hover:border-blue-500/50",
-                "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-                "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
-                "transition-all duration-300"
+                "shadow-[0_0_12px_rgba(59,130,246,0.4)]",
+                "hover:shadow-[0_0_16px_rgba(59,130,246,0.5)]",
+                "border-0 text-base",
+                "min-w-[150px]",
+                "h-11",
+                "px-6"
               )}
-              asChild
             >
-              <SignIn />
-            </Button>
-            <span className="text-gray-400">Free credits to get started</span>
+              Get Started
+            </SignIn>
+            <span className="text-gray-400">Cost effective!</span>
           </div>
         </div>
 
@@ -119,21 +118,20 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Join creators who trust Scene AI for professional background removal.
           </p>
-          <Button 
-            size="lg" 
+          <SignIn 
             className={cn(
-              "text-lg relative overflow-hidden group",
               "bg-gradient-to-r from-blue-600 to-blue-500",
               "hover:from-blue-500 hover:to-blue-600",
-              "border border-blue-500/20 hover:border-blue-500/50",
-              "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-              "hover:shadow-[0_0_25px_rgba(59,130,246,0.3)]",
-              "transition-all duration-300"
+              "shadow-[0_0_12px_rgba(59,130,246,0.4)]",
+              "hover:shadow-[0_0_16px_rgba(59,130,246,0.5)]",
+              "border-0 text-base",
+              "min-w-[150px]",
+              "h-11",
+              "px-6"
             )}
-            asChild
           >
-            <SignIn />
-          </Button>
+            Start Removing Backgrounds
+          </SignIn>
         </div>
       </main>
 

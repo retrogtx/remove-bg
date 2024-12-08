@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Progress } from "@/components/ui/progress"
 import { supabase } from '@/lib/supabase'
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/use-toast"
 import { useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 

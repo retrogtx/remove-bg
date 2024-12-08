@@ -1,4 +1,5 @@
-import { Home, Upload, History, CreditCard, Settings } from "lucide-react"
+import { Home } from "lucide-react"
+import SignOut from "@/components/sign-out"
 
 import {
   Sidebar,
@@ -16,27 +17,7 @@ const items = [
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
-  },
-  {
-    title: "Upload",
-    url: "/dashboard/upload",
-    icon: Upload,
-  },
-  {
-    title: "History",
-    url: "/dashboard/history",
-    icon: History,
-  },
-  {
-    title: "Billing",
-    url: "/dashboard/billing",
-    icon: CreditCard,
-  },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
+  }
 ]
 
 export function AppSidebar() {
@@ -61,6 +42,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <div className="absolute bottom-4 left-4">
+        <SignOut />
+      </div>
     </Sidebar>
   )
 }

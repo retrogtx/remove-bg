@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen">
         <AppSidebar />
         <main className="flex-1">
-          <div className="p-4">
+          <div className="p-4 flex justify-between items-center border-b">
             <SidebarTrigger />
           </div>
           {children}
