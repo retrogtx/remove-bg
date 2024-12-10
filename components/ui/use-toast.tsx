@@ -17,6 +17,8 @@ function genId() {
   return count.toString()
 }
 
+const TOAST_REMOVE_DELAY = 5000
+
 const toastState = React.createContext<{
   toasts: ToasterToast[]
   addToast: (toast: Omit<ToasterToast, "id">) => void
@@ -37,6 +39,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const removeToast = React.useCallback((id: string) => {
     setToasts((current) => current.filter((toast) => toast.id !== id))
   }, [])
+
+  React.useEffect(() => {
+    const timeouts = new Set<NodeJS.Timeout>()
+
+    toasts.forEach((toast) => {
+      const timeout = setTimeout(() => {
+        removeToast(toast.id)
+      }, TOAST_REMOVE_DELAY)
+
+      timeouts.add(timeout)
+    })
+
+    return () => {
+      timeouts.forEach((timeout) => clearTimeout(timeout))
+    }
+  }, [toasts, removeToast])
 
   return (
     <toastState.Provider value={{ toasts, addToast, removeToast }}>
