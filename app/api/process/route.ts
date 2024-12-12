@@ -8,10 +8,6 @@ if (!process.env.REPLICATE_API_TOKEN) {
   throw new Error('REPLICATE_API_TOKEN is not set')
 }
 
-if (!process.env.NEXT_PUBLIC_APP_URL) {
-  throw new Error('NEXT_PUBLIC_APP_URL is not set')
-}
-
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN
 })
