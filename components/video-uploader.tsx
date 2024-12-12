@@ -6,6 +6,13 @@ import { Upload, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Job {
   id: string
@@ -23,11 +30,21 @@ interface JobsResponse {
   jobs: Job[]
 }
 
+// Add output type options
+const OUTPUT_TYPES = [
+  { label: "Foreground Mask", value: "foreground-mask" },
+  { label: "Alpha Mask", value: "alpha-mask" },
+  { label: "Green Screen", value: "green-screen" },
+] as const
+
+type OutputType = typeof OUTPUT_TYPES[number]["value"]
+
 export function VideoUploader() {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null)
+  const [outputType, setOutputType] = useState<OutputType>("green-screen")
   const { toast } = useToast()
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -113,8 +130,8 @@ export function VideoUploader() {
 
       const formData = new FormData()
       formData.append("file", uploadedVideo)
+      formData.append("outputType", outputType)
 
-      // Upload and start processing in one request
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -132,7 +149,6 @@ export function VideoUploader() {
         description: "Your video is being processed. You can check its status in the video list.",
       })
 
-      // Reset state
       setUploadedVideo(null)
       setUploadProgress(0)
     } catch (error) {
@@ -187,17 +203,47 @@ export function VideoUploader() {
       </div>
 
       {uploadedVideo && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="font-medium">{uploadedVideo.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB
-              </p>
+        <div className="mt-6 space-y-4">
+          <div className="p-4 border rounded-lg bg-card">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="font-medium truncate">{uploadedVideo.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+              </div>
             </div>
-            <Button 
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto justify-start"
+                >
+                  <span className="truncate">
+                    Variant: {OUTPUT_TYPES.find(t => t.value === outputType)?.label}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                <DropdownMenuLabel>Select Variant</DropdownMenuLabel>
+                {OUTPUT_TYPES.map((type) => (
+                  <DropdownMenuItem
+                    key={type.value}
+                    onClick={() => setOutputType(type.value)}
+                  >
+                    {type.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button
               onClick={handleUpload}
               disabled={isUploading}
+              className="w-full sm:w-auto"
             >
               {isUploading ? (
                 <>
@@ -211,9 +257,9 @@ export function VideoUploader() {
           </div>
           
           {isUploading && (
-            <div className="mt-4">
+            <div className="space-y-2">
               <Progress value={uploadProgress} className="h-2" />
-              <p className="text-sm text-muted-foreground mt-2 text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Uploading: {uploadProgress}%
               </p>
             </div>

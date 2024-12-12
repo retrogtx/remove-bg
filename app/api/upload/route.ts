@@ -19,6 +19,7 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
     const file = formData.get("file") as File
+    const outputType = formData.get("outputType") as string || "green-screen"
     
     // Validate file
     if (!file || !ALLOWED_TYPES.includes(file.type)) {
@@ -71,7 +72,10 @@ export async function POST(req: Request) {
           'Content-Type': 'application/json',
           'Cookie': req.headers.get('cookie') || ''
         },
-        body: JSON.stringify({ jobId: job.id })
+        body: JSON.stringify({ 
+          jobId: job.id,
+          outputType 
+        })
       })
 
       if (!processResponse.ok) {

@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { jobId } = await req.json()
+    const { jobId, outputType = "foreground-mask" } = await req.json()
     if (!jobId) {
       return NextResponse.json({ error: "No job ID provided" }, { status: 400 })
     }
@@ -68,7 +68,8 @@ export async function POST(req: Request) {
       await replicate.predictions.create({
         version: "73d2128a371922d5d1abf0712a1d974be0e4e2358cc1218e4e34714767232bac",
         input: {
-          input_video: publicUrl
+          input_video: publicUrl,
+          output_type: outputType
         },
         ...webhookConfig
       })
