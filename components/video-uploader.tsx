@@ -114,14 +114,18 @@ export function VideoUploader() {
       const formData = new FormData()
       formData.append("file", uploadedVideo)
 
-      const uploadResponse = await fetch("/api/process", {
+      // Upload and start processing in one request
+      const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
+        credentials: 'include'
       })
 
       if (!uploadResponse.ok) {
         throw new Error(await uploadResponse.text())
       }
+
+      await uploadResponse.json()
 
       toast({
         title: "Upload successful",
