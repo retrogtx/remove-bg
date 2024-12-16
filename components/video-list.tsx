@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress"
 import { supabase } from '@/lib/supabase'
 import { useToast } from "@/hooks/use-toast"
 import { useMutation } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
 
 interface JobsResponse {
   jobs: Job[]
@@ -43,19 +42,10 @@ export function VideoList() {
   })
 
   useEffect(() => {
-    fetchJobs()
-    // Refresh every 5 seconds
-    const interval = setInterval(fetchJobs, 5000)
+    mutate()
+    const interval = setInterval(() => mutate(), 5000)
     return () => clearInterval(interval)
-  }, [])
-
-  const fetchJobs = async () => {
-    const response = await fetch('/api/jobs')
-    if (response.ok) {
-      const data = await response.json()
-      setJobs(data.jobs)
-    }
-  }
+  }, [mutate])
 
   const getVideoUrl = (path: string) => {
     if (!path) return ''
@@ -63,42 +53,11 @@ export function VideoList() {
     return data.publicUrl
   }
 
-  const handleRecoverJobs = async () => {
-    try {
-      const response = await fetch('/api/jobs/recover', {
-        method: 'POST'
-      })
-      
-      if (!response.ok) {
-        throw new Error(await response.text())
-      }
-
-      const result = await response.json()
-      
-      toast({
-        title: "Recovery Complete",
-        description: `Recovered ${result.recoveredJobs.length} jobs`,
-      })
-
-      // Refresh the jobs list
-      mutate()
-    } catch (error) {
-      console.error('Recovery failed:', error)
-      toast({
-        title: "Recovery failed",
-        description: error instanceof Error ? error.message : "Please try again",
-        variant: "destructive",
-      })
-    }
-  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Your Videos</h2>
-        <Button onClick={handleRecoverJobs} variant="outline">
-          Recover Failed Jobs
-        </Button>
       </div>
       
       <div className="grid gap-6">
