@@ -5,12 +5,18 @@ import { Button } from '@/components/ui/button';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white relative overflow-hidden">
-      {/* Enhanced background with animated gradient and grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-purple-500/5 to-blue-500/5 animate-gradient-slow" />
+    <div className="relative min-h-screen bg-black">
+      {/* Base dark gradient layer */}
+      <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-gray-900 to-black" />
       
-      <div className="relative">
+      {/* Grid pattern with optimized rendering */}
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] will-change-transform" />
+      
+      {/* Animated gradient with performance optimizations */}
+      <div className="fixed inset-0 bg-gradient-to-tr from-blue-500/5 via-purple-500/5 to-blue-500/5 animate-gradient-slow will-change-transform" />
+      
+      {/* Content container */}
+      <div className="relative z-10">
         <nav className="container mx-auto px-6 py-6 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent hover:scale-105 transition-transform cursor-pointer">
@@ -35,7 +41,7 @@ export default function Home() {
             >
               <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
               Instant Background Removal
-              <ArrowRight className="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 ml-2 opacity-100 translate-x-1 transition-all" />
             </Button>
             
             <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-400 to-blue-600 animate-gradient leading-tight">
@@ -94,23 +100,49 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Enhanced How It Works Section */}
-          <div className="mt-48 mb-8 text-center relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent rounded-3xl" />
-            <div className="grid md:grid-cols-3 gap-16 mb-8 relative">
-              <div className="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent -translate-y-1/2 hidden md:block" />
+          {/* How It Works Section */}
+          <div className="mt-48 mb-32 relative">
+            <h2 className="text-3xl font-medium text-center mb-24 tracking-tight">
+              How It Works
+            </h2>
+            
+            <div className="grid md:grid-cols-3 gap-24 relative max-w-5xl mx-auto px-6">
               {[
-                { num: "1", title: "Upload Video", desc: "Drop your video with any background - green screen or natural" },
-                { num: "2", title: "AI Processing", desc: "Our AI precisely removes the background frame by frame" },
-                { num: "3", title: "Download", desc: "Get your video with transparent or custom background" }
+                {
+                  num: "01",
+                  title: "Upload Video",
+                  desc: "Drop your video with any background",
+                },
+                {
+                  num: "02",
+                  title: "AI Processing",
+                  desc: "Our AI removes the background instantly",
+                },
+                {
+                  num: "03",
+                  title: "Download",
+                  desc: "Get your video with a new background",
+                }
               ].map((step, i) => (
-                <div key={i} className="group hover:-translate-y-1 transition-transform duration-300">
-                  <div className="text-4xl font-bold text-blue-400 mb-6 group-hover:scale-110 transition-transform relative">
-                    <span className="relative z-10">{step.num}</span>
-                    <div className="absolute inset-0 bg-blue-500/10 rounded-full scale-150 blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
+                <div
+                  key={i}
+                  className="group relative flex flex-col items-start"
+                >
+                  {/* Step number with gradient */}
+                  <div className="text-sm font-light mb-8 bg-gradient-to-r from-blue-400/40 to-purple-400/40 bg-clip-text text-transparent tracking-wider">
+                    {step.num}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 group-hover:text-blue-400 transition-colors">{step.title}</h3>
-                  <p className="text-gray-400 group-hover:text-gray-300 transition-colors">{step.desc}</p>
+                  
+                  {/* Content */}
+                  <h3 className="text-lg font-medium mb-3 text-white/90 tracking-tight">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed">
+                    {step.desc}
+                  </p>
+
+                  {/* Subtle hover effect with gradient border */}
+                  <div className="absolute -inset-4 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10" />
                 </div>
               ))}
             </div>
