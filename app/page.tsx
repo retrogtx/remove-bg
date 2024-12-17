@@ -2,7 +2,6 @@ import SignIn from '@/components/sign-in';
 import { Footer } from '@/components/footer';
 import { Zap, Shield, Clock, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 export default function Home() {
   return (
@@ -18,7 +17,7 @@ export default function Home() {
               Scene AI
             </div>
             <div className="space-x-4">
-              <SignIn>Sign In</SignIn>
+              <SignIn />
             </div>
           </div>
         </nav>
@@ -49,26 +48,9 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-              <SignIn 
-                className={cn(
-                  "bg-gradient-to-r from-blue-600 to-blue-500",
-                  "hover:from-blue-500 hover:to-blue-600",
-                  "shadow-[0_0_12px_rgba(59,130,246,0.4)]",
-                  "hover:shadow-[0_0_24px_rgba(59,130,246,0.6)]",
-                  "border-0 text-base",
-                  "min-w-[150px]",
-                  "h-12",
-                  "px-8",
-                  "hover:scale-105 transition-all duration-300",
-                  "relative overflow-hidden group"
-                )}
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  Get Started
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 group-hover:scale-110 transition-transform duration-300" />
-              </SignIn>
+              <div>
+                <SignIn />
+              </div>
               <span className="text-gray-400 hover:text-gray-300 transition-colors flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 Cost effective!
@@ -144,25 +126,9 @@ export default function Home() {
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 Join creators who trust Scene AI for professional background removal.
               </p>
-              <SignIn 
-                className={cn(
-                  "bg-gradient-to-r from-blue-600 to-blue-500",
-                  "hover:from-blue-500 hover:to-blue-600",
-                  "shadow-[0_0_12px_rgba(59,130,246,0.4)]",
-                  "hover:shadow-[0_0_24px_rgba(59,130,246,0.6)]",
-                  "border-0 text-base",
-                  "min-w-[150px]",
-                  "h-12",
-                  "px-8",
-                  "hover:scale-105 transition-all duration-300",
-                  "group"
-                )}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  Start Removing Backgrounds
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </SignIn>
+              <div>
+                <SignIn />
+              </div>
             </div>
           </div>
         </main>
