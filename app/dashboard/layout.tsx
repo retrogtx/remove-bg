@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import SignOut from "@/components/sign-out"
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
         <main className="flex-1">
           <div className="p-4 flex justify-between items-center border-b">
             <SidebarTrigger />
+            <SignOut />
           </div>
           {children}
         </main>
