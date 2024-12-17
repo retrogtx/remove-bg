@@ -1,42 +1,21 @@
-"use client"
+import { signIn } from "@/auth"
+import { LoadingButton } from "@/components/loading-button"
+import Image from "next/image"
 
-import { signInAction } from "@/app/actions"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
-
-interface SignInProps {
-  className?: string;
-  children?: React.ReactNode;
+async function handleSignIn() {
+  "use server"
+  await signIn("google")
 }
 
-export default function SignIn({ className, children = "Sign In" }: SignInProps) {
-  const [isLoading, setIsLoading] = useState(false)
-
+export default function SignIn() {
   return (
-    <form
-      action={async () => {
-        if (isLoading) return
-        setIsLoading(true)
-        await signInAction()
-      }}
-    >
-      <Button 
-        type="submit"
-        disabled={isLoading}
-        className={className}
-      >
+    <form action={handleSignIn}>
+      <LoadingButton>
         <div className="flex items-center gap-2">
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Signing in...</span>
-            </>
-          ) : (
-            children
-          )}
+          <Image src="/google.svg" alt="" width={20} height={20} />
+          Sign In with Google
         </div>
-      </Button>
+      </LoadingButton>
     </form>
   )
 } 

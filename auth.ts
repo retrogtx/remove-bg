@@ -6,7 +6,6 @@ import google from "next-auth/providers/google"
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [google],
-  trustHost: true,
   callbacks: {
     session: async ({ session, user }) => {
       if (session?.user) {
