@@ -2,7 +2,7 @@ import { db } from "@/prisma"
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 
-export const maxDuration = 300 // 5 minutes timeout for cleanup job
+export const maxDuration = 60 
 
 export async function POST() {
   try {
