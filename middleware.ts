@@ -5,12 +5,9 @@ import { auth } from "@/auth"
 export async function middleware(request: NextRequest) {
   const session = await auth()
 
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (!session && (request.nextUrl.pathname.startsWith('/dashboard') || 
+                   request.nextUrl.pathname.startsWith('/data'))) {
     return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  if (session && request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   if (session && request.nextUrl.pathname === '/') {
@@ -21,5 +18,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/", "/signin"],
+  matcher: ["/dashboard/:path*", "/data/:path*", "/", "/signin"],
 }

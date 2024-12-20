@@ -1,4 +1,4 @@
-import { Home } from "lucide-react"
+import { Home, Database } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,11 @@ const items = [
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Data",
+    url: "/data",
+    icon: Database,
   }
 ]
 
