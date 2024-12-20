@@ -1,11 +1,11 @@
 import { auth } from "@/auth"
 import { db } from "@/prisma"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { jobId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,13 +13,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const params = await context.params
     const jobId = params.jobId
     
     // Get the job to find associated files
     const job = await db.job.findUnique({
       where: {
         id: jobId,
-        userId: session.user.id // Ensure the job belongs to the user
+        userId: session.user.id
       }
     })
 

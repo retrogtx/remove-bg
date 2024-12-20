@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -20,31 +20,36 @@ interface Job {
   createdAt: string
 }
 
+interface FetchError extends Error {
+  status?: number
+}
+
 export function DataTable() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchJobs()
-  }, [])
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const response = await fetch('/api/jobs')
       if (!response.ok) throw new Error('Failed to fetch jobs')
       const data = await response.json()
       setJobs(data.jobs)
-    } catch (error) {
+    } catch (error: unknown) {
+      const e = error as FetchError
       toast({
         title: "Error fetching data",
-        description: "Please try again later",
+        description: e.message || "Please try again later",
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    fetchJobs()
+  }, [fetchJobs])
 
   const handleDelete = async (jobId: string) => {
     try {
@@ -59,12 +64,12 @@ export function DataTable() {
         description: "Your video has been removed",
       })
       
-      // Refresh the jobs list
       fetchJobs()
-    } catch (error) {
+    } catch (error: unknown) {
+      const e = error as FetchError
       toast({
         title: "Error deleting video",
-        description: "Please try again later",
+        description: e.message || "Please try again later",
         variant: "destructive",
       })
     }
