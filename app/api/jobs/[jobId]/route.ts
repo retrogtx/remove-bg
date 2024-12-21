@@ -56,4 +56,31 @@ export async function DELETE(
       { status: 500 }
     )
   }
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: { jobId: string } }
+) {
+  try {
+    const session = await auth()
+    if (!session?.user) {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    const job = await db.job.findUnique({
+      where: {
+        id: params.jobId,
+        userId: session.user.id
+      }
+    })
+
+    return NextResponse.json({ job })
+  } catch (error) {
+    console.error('Error fetching job:', error)
+    return new NextResponse(
+      error instanceof Error ? error.message : "Failed to fetch job", 
+      { status: 500 }
+    )
+  }
 } 
