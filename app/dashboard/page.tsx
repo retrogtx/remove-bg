@@ -1,31 +1,37 @@
+import { DataTable } from '@/components/data-table'
+import { columns } from '@/components/columns'
 import { auth } from "@/auth"
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation'
+import { getJobs } from '@/lib/jobs'
 import { VideoUploader } from "@/components/video-uploader"
-import { VideoList } from "@/components/video-list"
-import { AppSidebar } from "@/components/app-sidebar"
 import { createBucketIfNotExists } from "@/lib/supabase-admin"
+import Signout from '@/components/sign-out'
 
 export default async function DashboardPage() {
   const session = await auth()
-  if (!session?.user) {
-    redirect('/')
+  
+  if (!session?.user?.id) {
+    redirect('/auth')
   }
 
-  // Create bucket if it doesn't exist
   await createBucketIfNotExists()
-  
+
+  const jobs = await getJobs(session.user.id)
+
   return (
     <div className="flex min-h-screen">
-      <AppSidebar />
       <main className="flex-1 p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Upload videos and remove backgrounds</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">Upload videos and remove backgrounds</p>
+          </div>
+          <Signout />
         </div>
         
         <div className="space-y-10">
           <VideoUploader />
-          <VideoList />
+          <DataTable columns={columns} data={jobs} />
         </div>
       </main>
     </div>
