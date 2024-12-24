@@ -10,37 +10,38 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  context: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
+    const { jobId } = await params
     const session = await auth()
     if (!session?.user) {
-      return new NextResponse("Unauthorized", { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const job = await db.job.findUnique({
       where: {
-        id: context.params.jobId,
+        id: jobId,
         userId: session.user.id,
       },
     })
 
     if (!job || !job.processedPath) {
-      return new NextResponse("Not found", { status: 404 })
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
     }
 
     const { data, error } = await supabase.storage
       .from("upload")
-      .createSignedUrl(job.processedPath, 60) // URL valid for 60 seconds
+      .createSignedUrl(job.processedPath, 60)
 
     if (error || !data) {
       console.error("Error creating signed URL:", error)
-      return new NextResponse("Failed to generate download URL", { status: 500 })
+      return NextResponse.json({ error: "Failed to generate download URL" }, { status: 500 })
     }
 
     return NextResponse.json({ url: data.signedUrl })
   } catch (error) {
     console.error("Error in download route:", error)
-    return new NextResponse("Internal server error", { status: 500 })
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 } 
