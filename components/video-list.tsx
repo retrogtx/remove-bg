@@ -1,14 +1,17 @@
 "use client"
 
-import { useEffect, useState } from 'react'
-import { Progress } from "@/components/ui/progress"
-import { supabase } from '@/lib/supabase'
-import { useToast } from "@/hooks/use-toast"
-import { useMutation } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { supabase } from '@/lib/supabase'
 
 interface JobsResponse {
   jobs: Job[]
+  metadata: {
+    total: number
+    page: number
+    totalPages: number
+  }
 }
 
 type Job = {
@@ -21,42 +24,21 @@ type Job = {
 }
 
 export function VideoList() {
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
-  const { mutate } = useMutation<JobsResponse, Error>({
-    mutationFn: async () => {
-      const response = await fetch('/api/jobs')
+  const { data, isLoading } = useQuery<JobsResponse>({
+    queryKey: ['jobs'],
+    queryFn: async () => {
+      const response = await fetch('/api/jobs?page=1&limit=10')
       if (!response.ok) throw new Error('Failed to fetch jobs')
-      return response.json() as Promise<JobsResponse>
+      return response.json()
     },
-    onSuccess: (data: JobsResponse) => {
-      setJobs(data.jobs)
-      setIsLoading(false)
-    },
-    onError: (error: Error) => {
-      console.error('Error fetching jobs:', error)
-      toast({
-        title: "Error fetching jobs",
-        description: error.message || "Please try again",
-        variant: "destructive",
-      })
-      setIsLoading(false)
-    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
-
-  useEffect(() => {
-    mutate()
-    const interval = setInterval(() => mutate(), 5000)
-    return () => clearInterval(interval)
-  }, [mutate])
 
   const getVideoUrl = (path: string) => {
     if (!path) return ''
     const { data } = supabase.storage.from('upload').getPublicUrl(path)
     return data.publicUrl
   }
-
 
   return (
     <div className="space-y-6">
@@ -69,69 +51,24 @@ export function VideoList() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Loading your videos...</p>
         </div>
-      ) : jobs.length === 0 ? (
+      ) : !data?.jobs?.length ? (
         <div className="text-center py-10">
           <p className="text-muted-foreground">No videos found. Upload one to get started!</p>
         </div>
       ) : (
-        <div className="grid gap-6">
-          {jobs.map(job => (
+        <div className="grid gap-4">
+          {data.jobs.map(job => (
             <div key={job.id} className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex justify-between items-center">
                 <h3 className="font-medium">{job.fileName}</h3>
-                <span className={`px-2 py-1 rounded text-sm ${
-                  job.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  job.status === 'failed' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {job.status}
-                </span>
-              </div>
-
-              {job.status === 'processing' && (
-                <div className="space-y-2">
-                  <Progress value={undefined} className="mb-2" />
-                  <p className="text-sm text-muted-foreground text-center">
-                    Processing your video... This may take a few minutes
-                  </p>
-                </div>
-              )}
-
-              {job.status === 'pending' && (
-                <p className="text-sm text-muted-foreground text-center">
-                  Waiting to start processing...
-                </p>
-              )}
-
-              {job.error && (
-                <p className="text-red-600 text-sm mb-2">{job.error}</p>
-              )}
-
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Original Video */}
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Original</p>
-                  {job.filePath && (
-                    <video 
-                      key={job.filePath}
-                      src={getVideoUrl(job.filePath)}
-                      controls
-                      className="w-full rounded"
-                    />
-                  )}
-                </div>
-
-                {/* Processed Video */}
-                {job.processedPath && (
-                  <div>
-                    <p className="text-sm text-gray-500 mb-2">Processed</p>
-                    <video 
-                      key={job.processedPath}
-                      src={getVideoUrl(job.processedPath)}
-                      controls
-                      className="w-full rounded"
-                    />
-                  </div>
+                {job.status === 'completed' && job.processedPath && (
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => window.open(getVideoUrl(job.processedPath!), '_blank')}
+                  >
+                    Download
+                  </Button>
                 )}
               </div>
             </div>
