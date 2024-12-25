@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Job } from "@/types"
+import { Job } from "@/lib/types"
 import { formatDistanceToNow } from 'date-fns'
 import { Download, Loader2, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
