@@ -6,6 +6,7 @@ import { getJobs } from '@/lib/jobs'
 import { VideoUploader } from "@/components/video-uploader"
 import { createBucketIfNotExists } from "@/lib/supabase-admin"
 import Signout from '@/components/sign-out'
+import { formatISO } from 'date-fns'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -17,6 +18,12 @@ export default async function DashboardPage() {
   await createBucketIfNotExists()
 
   const jobs = await getJobs(session.user.id)
+
+  const formattedJobs = jobs.map(job => ({
+    ...job,
+    createdAt: formatISO(job.createdAt),
+    updatedAt: formatISO(job.updatedAt)
+  }))
 
   return (
     <div className="flex min-h-screen">
@@ -31,7 +38,7 @@ export default async function DashboardPage() {
         
         <div className="space-y-10">
           <VideoUploader />
-          <DataTable columns={columns} data={jobs} />
+          <DataTable columns={columns} data={formattedJobs} />
         </div>
       </main>
     </div>

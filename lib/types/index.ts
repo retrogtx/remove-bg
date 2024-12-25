@@ -1,7 +1,12 @@
 export interface Job {
   id: string
-  fileName: string
-  status: string
-  createdAt: Date
   userId: string
+  fileName: string
+  filePath: string
+  processedPath: string | null
+  fileSize: number
+  status: string
+  error: string | null
+  createdAt: string
+  updatedAt: string
 } 
