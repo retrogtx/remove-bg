@@ -39,7 +39,11 @@ const OUTPUT_TYPES = [
 
 type OutputType = typeof OUTPUT_TYPES[number]["value"]
 
-export function VideoUploader() {
+interface Props {
+  remainingCredits: number
+}
+
+export function VideoUploader({ remainingCredits }: Props) {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -102,7 +106,16 @@ export function VideoUploader() {
 
   const handleUpload = async () => {
     if (!uploadedVideo) return
-    
+
+    if (remainingCredits < 1) {
+      toast({
+        title: "No credits remaining",
+        description: "You need 1 credit to process a video",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setIsUploading(true)
       

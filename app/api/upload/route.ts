@@ -15,6 +15,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { credits: true }
+    })
+
+    if (!user || user.credits < 1) {
+      return NextResponse.json({ 
+        error: "Insufficient credits",
+        code: "INSUFFICIENT_CREDITS"
+      }, { status: 402 })
+    }
+
     const userId = session.user.id
 
     const formData = await req.formData()
@@ -29,6 +41,12 @@ export async function POST(req: Request) {
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: "File too large (max 100MB)" }, { status: 400 })
     }
+
+    // Deduct credit
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { credits: { decrement: 1 } }
+    })
 
     // 1. Upload original video to Supabase
     const fileName = `${userId}/${Date.now()}-${file.name}`

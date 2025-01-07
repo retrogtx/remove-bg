@@ -7,6 +7,7 @@ import { VideoUploader } from "@/components/video-uploader"
 import { createBucketIfNotExists } from "@/lib/supabase-admin"
 import Signout from '@/components/sign-out'
 import { formatISO } from 'date-fns'
+import { db } from "@/lib/prisma"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -16,6 +17,14 @@ export default async function DashboardPage() {
   }
 
   await createBucketIfNotExists()
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { 
+      id: true,
+      credits: true 
+    }
+  })
 
   const jobs = await getJobs(session.user.id)
 
@@ -33,11 +42,16 @@ export default async function DashboardPage() {
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">Upload videos and remove backgrounds</p>
           </div>
-          <Signout />
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium">
+              Credits: {user?.credits ?? 0}
+            </span>
+            <Signout />
+          </div>
         </div>
         
         <div className="space-y-10">
-          <VideoUploader />
+          <VideoUploader remainingCredits={user?.credits ?? 0} />
           <DataTable columns={columns} data={formattedJobs} />
         </div>
       </main>
