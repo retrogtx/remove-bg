@@ -52,12 +52,10 @@ export async function POST(req: Request) {
     })
 
     // Remove webhook during development
-    const webhookConfig = process.env.NODE_ENV === 'production' 
-      ? {
-          webhook: process.env.WEBHOOK_URL,
-          webhook_events_filter: ["completed"] as WebhookEventType[]
-        }
-      : {}
+    const webhookConfig = {
+      webhook: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`,
+      webhook_events_filter: ["completed"] as WebhookEventType[]
+    }
 
     // Start the prediction
     try {
