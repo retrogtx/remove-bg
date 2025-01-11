@@ -5,6 +5,10 @@ import { Webhook } from "standardwebhooks"
 
 const webhook = new Webhook(process.env.DODO_WEBHOOK_SECRET!)
 
+// Add runtime config for Vercel
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 // Add GET handler for testing
 export async function GET() {
   return NextResponse.json({ status: 'webhook endpoint ready' })
