@@ -4,8 +4,19 @@ import { supabaseAdmin } from "@/lib/supabase-admin"
 
 export const maxDuration = 60 
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
+    const { confirmationCode } = await req.json()
+    
+    // Require confirmation code that matches current date
+    const todayCode = new Date().toISOString().split('T')[0].replace(/-/g, '')
+    if (confirmationCode !== `CLEANUP-${todayCode}`) {
+      return NextResponse.json({ 
+        error: "Invalid confirmation code",
+        message: "To run cleanup, pass confirmation code: CLEANUP-YYYYMMDD (today's date)"
+      }, { status: 400 })
+    }
+
     // Find both stale processing jobs and old completed jobs in parallel
     const [staleJobs, oldCompletedJobs] = await Promise.all([
       db.job.findMany({
