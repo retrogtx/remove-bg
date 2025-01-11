@@ -8,6 +8,9 @@ import { createBucketIfNotExists } from "@/lib/supabase-admin"
 import Signout from '@/components/sign-out'
 import { formatISO } from 'date-fns'
 import { db } from "@/lib/prisma"
+import { BuyCredits } from "@/components/buy-credits"
+import { PaymentHistory } from "@/components/payment-history"
+import { PaymentSuccessToast } from "@/components/payment-success-toast"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -34,6 +37,11 @@ export default async function DashboardPage() {
     updatedAt: formatISO(job.updatedAt)
   }))
 
+  const payments = await db.payment.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: 'desc' }
+  })
+
   return (
     <div className="flex min-h-screen">
       <main className="flex-1 p-6">
@@ -46,12 +54,15 @@ export default async function DashboardPage() {
             <span className="text-sm font-medium">
               Credits: {user?.credits ?? 0}
             </span>
+            <BuyCredits />
             <Signout />
           </div>
         </div>
         
         <div className="space-y-10">
           <VideoUploader remainingCredits={user?.credits ?? 0} />
+          <PaymentHistory payments={payments} />
+          <PaymentSuccessToast />
           <DataTable columns={columns} data={formattedJobs} />
         </div>
       </main>
