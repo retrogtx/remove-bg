@@ -50,6 +50,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   jobs          Job[]
+  payments      Payment[]
  
   @@map("users")
 }
@@ -80,4 +81,26 @@ model Job {
   @@index([status])
   @@unique([userId, fileName, status])
   @@map("jobs")
+}
+
+model Payment {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  amount        Float
+  credits       Int
+  status        PaymentStatus @default(pending)
+  paymentId     String    @unique // Dodo payment ID
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  metadata      Json?     // Store additional payment info
+ 
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
 }
