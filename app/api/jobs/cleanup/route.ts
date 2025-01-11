@@ -6,9 +6,14 @@ export const maxDuration = 60
 
 export async function POST(req: Request) {
   try {
-    const { confirmationCode } = await req.json()
+    const { confirmationCode, adminKey } = await req.json()
     
-    // Require confirmation code that matches current date
+    // Check admin key first
+    if (adminKey !== process.env.ADMIN_SECRET) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Then check confirmation code
     const todayCode = new Date().toISOString().split('T')[0].replace(/-/g, '')
     if (confirmationCode !== `CLEANUP-${todayCode}`) {
       return NextResponse.json({ 

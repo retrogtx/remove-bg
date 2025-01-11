@@ -8,8 +8,15 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN
 })
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
+    const { adminKey } = await req.json()
+    
+    // Verify admin access
+    if (adminKey !== process.env.ADMIN_SECRET) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
