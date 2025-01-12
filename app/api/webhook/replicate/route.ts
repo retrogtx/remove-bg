@@ -11,18 +11,19 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
-    console.log('========================')
-    console.log('WEBHOOK RECEIVED')
-    console.log('Headers:', Object.fromEntries(req.headers.entries()))
-    
     const body = await req.json()
-    console.log('Webhook Body:', JSON.stringify(body, null, 2))
-    
-    // Find the job using replicateId
-    const job = await db.job.findFirst({
-      where: { replicateId: body.prediction?.id || body.id }
+    console.log('Webhook received:', {
+      prediction: body.prediction,
+      id: body.id,
+      status: body.status
     })
-    console.log('Found job:', job)
+    
+    // Find the job using replicateId from the prediction
+    const job = await db.job.findFirst({
+      where: { 
+        replicateId: body.prediction?.id || body.id 
+      }
+    })
 
     if (!job) {
       console.error('No job found for replicate ID:', body.prediction?.id || body.id)
@@ -30,9 +31,11 @@ export async function POST(req: Request) {
     }
 
     if (body.status === "succeeded") {
-      console.log('Processing succeeded, output URL:', body.output)
+      const output = body.prediction?.output || body.output
+      console.log('Processing succeeded, output URL:', output)
+      
       // Download the processed video from Replicate
-      const response = await fetch(body.output)
+      const response = await fetch(output)
       console.log('Download response:', {
         status: response.status,
         ok: response.ok,

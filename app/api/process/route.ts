@@ -53,23 +53,20 @@ export async function POST(req: Request) {
 
     // Start the prediction
     try {
-      const webhookConfig = {
-        webhook: process.env.NODE_ENV === 'development'
-          ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`
-          : `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`,
-        webhook_events_filter: ["completed"] as WebhookEventType[]
-      }
-
+      const callbackURL = new URL('/api/webhook/replicate', process.env.NEXT_PUBLIC_APP_URL).toString()
+      console.log('Setting up webhook:', callbackURL)
+      
       const prediction = await replicate.predictions.create({
         version: "73d2128a371922d5d1abf0712a1d974be0e4e2358cc1218e4e34714767232bac",
         input: {
           input_video: publicUrl,
           output_type: outputType
         },
-        ...webhookConfig
+        webhook: callbackURL,
+        webhook_events_filter: ["completed"] as WebhookEventType[]
       })
 
-      // Store the prediction ID
+      // Store the prediction ID immediately
       await db.job.update({
         where: { id: job.id },
         data: { 
@@ -78,9 +75,16 @@ export async function POST(req: Request) {
         }
       })
 
+      console.log('Created prediction:', {
+        predictionId: prediction.id,
+        jobId: job.id,
+        webhook: callbackURL
+      })
+
       return NextResponse.json({ 
         message: "Processing started",
-        jobId: job.id 
+        jobId: job.id,
+        predictionId: prediction.id
       }, { status: 202 })
 
     } catch (error) {
