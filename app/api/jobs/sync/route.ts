@@ -2,7 +2,6 @@ import { db } from "@/prisma"
 import { NextResponse } from "next/server"
 import Replicate from "replicate"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { auth } from "@/auth"
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN
@@ -17,15 +16,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // Get all processing jobs
+    // Get all processing jobs (remove user session check)
     const processingJobs = await db.job.findMany({
       where: {
-        userId: session.user.id,
         status: "processing"
       }
     })
@@ -82,5 +75,31 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Sync error:', error)
     return NextResponse.json({ error: "Sync failed" }, { status: 500 })
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const jobId = searchParams.get('jobId')
+    
+    if (!jobId) {
+      const { results } = await replicate.predictions.list()
+      return NextResponse.json({ predictions: results })
+    }
+
+    const job = await db.job.findUnique({
+      where: { id: jobId }
+    })
+
+    if (!job?.replicateId) {
+      return NextResponse.json({ error: "No replicate ID found" }, { status: 404 })
+    }
+
+    const prediction = await replicate.predictions.get(job.replicateId)
+    return NextResponse.json({ prediction })
+  } catch (error) {
+    console.error('Error checking prediction:', error)
+    return NextResponse.json({ error: "Failed to check prediction" }, { status: 500 })
   }
 } 

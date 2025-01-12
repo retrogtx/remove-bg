@@ -11,22 +11,41 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
+    console.log('========================')
+    console.log('WEBHOOK RECEIVED')
+    console.log('Headers:', Object.fromEntries(req.headers.entries()))
     
-    // Update job status to processing first
-    const job = await db.job.update({
-      where: { id: body.id },
-      data: { status: "processing" }
+    const body = await req.json()
+    console.log('Webhook Body:', JSON.stringify(body, null, 2))
+    
+    // Find the job using replicateId
+    const job = await db.job.findFirst({
+      where: { replicateId: body.prediction?.id || body.id }
     })
+    console.log('Found job:', job)
+
+    if (!job) {
+      console.error('No job found for replicate ID:', body.prediction?.id || body.id)
+      return NextResponse.json({ error: "Job not found" }, { status: 404 })
+    }
 
     if (body.status === "succeeded") {
+      console.log('Processing succeeded, output URL:', body.output)
       // Download the processed video from Replicate
       const response = await fetch(body.output)
+      console.log('Download response:', {
+        status: response.status,
+        ok: response.ok,
+        contentType: response.headers.get('content-type'),
+        contentLength: response.headers.get('content-length')
+      })
+
       if (!response.ok) {
         throw new Error(`Failed to download processed video: ${response.statusText}`)
       }
 
       const videoBuffer = Buffer.from(await response.arrayBuffer())
+      console.log('Video buffer size:', videoBuffer.length)
       
       if (!videoBuffer.length) {
         throw new Error('Received empty video buffer from Replicate')
@@ -34,6 +53,8 @@ export async function POST(req: Request) {
 
       // Upload to Supabase
       const processedFileName = `processed/${job.id}/${job.fileName}`
+      console.log('Uploading to Supabase:', processedFileName)
+      
       const { data: uploadData, error: uploadError } = await supabaseAdmin
         .storage
         .from('upload')
@@ -43,8 +64,11 @@ export async function POST(req: Request) {
         })
 
       if (uploadError) {
+        console.error('Supabase upload error:', uploadError)
         throw new Error(`Failed to upload processed video: ${uploadError.message}`)
       }
+
+      console.log('Upload successful:', uploadData)
 
       // Update job with success
       await db.job.update({

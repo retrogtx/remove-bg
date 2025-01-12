@@ -51,21 +51,31 @@ export async function POST(req: Request) {
       data: { status: "processing" }
     })
 
-    // Remove webhook during development
-    const webhookConfig = {
-      webhook: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`,
-      webhook_events_filter: ["completed"] as WebhookEventType[]
-    }
-
     // Start the prediction
     try {
-      await replicate.predictions.create({
+      const webhookConfig = {
+        webhook: process.env.NODE_ENV === 'development'
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`
+          : `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/replicate`,
+        webhook_events_filter: ["completed"] as WebhookEventType[]
+      }
+
+      const prediction = await replicate.predictions.create({
         version: "73d2128a371922d5d1abf0712a1d974be0e4e2358cc1218e4e34714767232bac",
         input: {
           input_video: publicUrl,
           output_type: outputType
         },
         ...webhookConfig
+      })
+
+      // Store the prediction ID
+      await db.job.update({
+        where: { id: job.id },
+        data: { 
+          status: "processing",
+          replicateId: prediction.id
+        }
       })
 
       return NextResponse.json({ 
