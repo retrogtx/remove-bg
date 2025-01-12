@@ -43,11 +43,11 @@ export function DataTable<TData, TValue>({
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-[10px] sm:text-sm p-2 sm:p-4">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -62,35 +62,33 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row: Row<TData>) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell: Cell<TData, unknown>) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="text-[10px] sm:text-sm p-2 sm:p-4">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No videos yet.
+                <TableCell colSpan={columns.length} className="h-16 sm:h-24 text-center text-[10px] sm:text-sm">
+                  No results.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-2 py-2 sm:py-4">
         <Button
           variant="outline"
           size="sm"
+          className="text-[10px] sm:text-sm h-7 sm:h-9"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -99,6 +97,7 @@ export function DataTable<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
+          className="text-[10px] sm:text-sm h-7 sm:h-9"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

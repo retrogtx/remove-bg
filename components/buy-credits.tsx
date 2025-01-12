@@ -44,6 +44,7 @@ export function BuyCredits() {
     <Button
       onClick={handleBuyCredits}
       disabled={isLoading}
+      className="whitespace-nowrap"
     >
       {isLoading ? (
         <>
@@ -51,7 +52,7 @@ export function BuyCredits() {
           Processing...
         </>
       ) : (
-        <>Buy 25 Credits ($7.00)</>
+        <>Buy 25</>
       )}
     </Button>
   )

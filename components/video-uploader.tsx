@@ -180,7 +180,7 @@ export function VideoUploader({ remainingCredits }: Props) {
     <div className="w-full max-w-3xl mx-auto">
       <div
         className={cn(
-          "border-2 border-dashed rounded-lg p-12 transition-colors",
+          "border-2 border-dashed rounded-lg p-4 sm:p-12 transition-colors h-[200px] sm:h-auto",
           "hover:border-primary/50 hover:bg-muted/50",
           isDragging ? "border-primary bg-primary/5" : "border-border"
         )}
@@ -188,38 +188,29 @@ export function VideoUploader({ remainingCredits }: Props) {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Upload className="h-10 w-10 text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center h-full gap-2 sm:gap-4">
+          <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
           <div className="text-center">
-            <p className="text-lg font-medium">Drag and drop your video here</p>
-            <p className="text-sm text-muted-foreground">MP4, MOV, or AVI up to 100MB</p>
+            <p className="text-base sm:text-lg font-medium">Drag and drop your video here</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">MP4, MOV, or AVI up to 100MB</p>
           </div>
-          <div className="mt-4">
-            <input
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={handleFileSelect}
-              id="video-upload"
-            />
-            <Button 
-              variant="outline" 
-              className="cursor-pointer"
-              asChild
-            >
-              <label htmlFor="video-upload">
-                Select Video
-              </label>
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            className="cursor-pointer mt-2"
+            asChild
+          >
+            <label htmlFor="video-upload">
+              Select Video
+            </label>
+          </Button>
         </div>
       </div>
 
       {uploadedVideo && (
-        <div className="mt-6 space-y-4">
-          <div className="p-4 border rounded-lg bg-card">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
+        <div className="mt-4 space-y-3">
+          <div className="p-3 sm:p-4 border rounded-lg bg-card">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
                 <p className="font-medium truncate">{uploadedVideo.name}</p>
                 <p className="text-sm text-muted-foreground">
                   {(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB
@@ -228,15 +219,12 @@ export function VideoUploader({ remainingCredits }: Props) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto justify-start"
-                >
+                <Button variant="outline" className="w-full sm:w-auto justify-between">
                   <span className="truncate">
-                    Variant: {OUTPUT_TYPES.find(t => t.value === outputType)?.label}
+                    {OUTPUT_TYPES.find(t => t.value === outputType)?.label}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
