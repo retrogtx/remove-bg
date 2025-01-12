@@ -6,9 +6,6 @@ import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
-  HeaderGroup,
-  Row,
-  Cell,
 } from "@tanstack/react-table"
 
 import {

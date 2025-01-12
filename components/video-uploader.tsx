@@ -194,6 +194,13 @@ export function VideoUploader({ remainingCredits }: Props) {
             <p className="text-base sm:text-lg font-medium">Drag and drop your video here</p>
             <p className="text-xs sm:text-sm text-muted-foreground">MP4, MOV, or AVI up to 100MB</p>
           </div>
+          <input
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={handleFileSelect}
+            id="video-upload"
+          />
           <Button 
             variant="outline" 
             className="cursor-pointer mt-2"
