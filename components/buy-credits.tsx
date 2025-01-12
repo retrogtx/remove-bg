@@ -45,6 +45,7 @@ export function BuyCredits() {
       onClick={handleBuyCredits}
       disabled={isLoading}
       className="whitespace-nowrap"
+      data-buy-credits
     >
       {isLoading ? (
         <>

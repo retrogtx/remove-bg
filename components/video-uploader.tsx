@@ -44,6 +44,8 @@ interface Props {
 }
 
 export function VideoUploader({ remainingCredits }: Props) {
+  console.log('VideoUploader mounted with credits:', remainingCredits)
+
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -107,11 +109,13 @@ export function VideoUploader({ remainingCredits }: Props) {
   const handleUpload = async () => {
     if (!uploadedVideo) return
 
+    console.log('Upload attempted with credits:', remainingCredits)
+    console.log('Credit check result:', remainingCredits < 1)
+
     if (remainingCredits < 1) {
       toast({
-        title: "No credits remaining",
-        description: "You need 1 credit to process a video",
-        variant: "destructive",
+        title: "Insufficient Credits",
+        description: "You need at least 1 credit to process a video.",
       })
       return
     }
@@ -136,7 +140,6 @@ export function VideoUploader({ remainingCredits }: Props) {
         toast({
           title: "Duplicate Upload",
           description: "This video is already being processed",
-          variant: "destructive",
         })
         return
       }
@@ -169,7 +172,6 @@ export function VideoUploader({ remainingCredits }: Props) {
       toast({
         title: "Upload failed",
         description: error instanceof Error ? error.message : "Please try again",
-        variant: "destructive",
       })
     } finally {
       setIsUploading(false)
