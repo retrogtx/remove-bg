@@ -80,7 +80,6 @@ model Job {
 
   @@index([userId])
   @@index([status])
-  @@unique([userId, fileName, status])
   @@map("jobs")
 }
 
