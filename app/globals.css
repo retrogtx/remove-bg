@@ -4,6 +4,8 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: black;
+  color: white;
 }
 
 @layer base {
@@ -128,5 +130,9 @@ body {
     @apply bg-black min-h-screen overflow-x-hidden;
     will-change: transform;
   }
+}
+
+.glow {
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
 }
 

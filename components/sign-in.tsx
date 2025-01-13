@@ -1,11 +1,6 @@
-import { signIn } from "@/auth"
+import { handleSignIn } from "@/app/actions/auth"
 import { LoadingButton } from "@/components/loading-button"
 import Image from "next/image"
-
-async function handleSignIn() {
-  "use server"
-  await signIn("google")
-}
 
 export default function SignIn() {
   return (
