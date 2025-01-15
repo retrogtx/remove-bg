@@ -7,6 +7,14 @@ import { NextResponse } from "next/server"
 const MAX_FILE_SIZE = 100 * 1024 * 1024
 const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '100mb'
+    }
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const session = await auth()
