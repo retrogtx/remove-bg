@@ -1,8 +1,7 @@
 {
   "functions": {
-    "api/*": {
-      "maxDuration": 60,
-      "maxPayloadSize": "100mb"
+    "/api/*": {
+      "maxDuration": 60
     }
   }
 }

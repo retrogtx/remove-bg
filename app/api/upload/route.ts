@@ -1,19 +1,10 @@
 import { auth } from "@/auth"
-import { supabaseAdmin } from "@/lib/supabase-admin"
 import { db } from "@/prisma"
 import { NextResponse } from "next/server"
 
 // Constants
 const MAX_FILE_SIZE = 100 * 1024 * 1024
 const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '100mb'
-    }
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -37,16 +28,14 @@ export async function POST(req: Request) {
 
     const userId = session.user.id
 
-    const formData = await req.formData()
-    const file = formData.get("file") as File
-    const outputType = formData.get("outputType") as string || "green-screen"
+    const { filePath, fileName, fileSize, fileType, outputType } = await req.json()
     
-    // Validate file
-    if (!file || !ALLOWED_TYPES.includes(file.type)) {
+    // Validate file metadata
+    if (!ALLOWED_TYPES.includes(fileType)) {
       return NextResponse.json({ error: "Invalid file type" }, { status: 400 })
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (fileSize > MAX_FILE_SIZE) {
       return NextResponse.json({ error: "File too large (max 100MB)" }, { status: 400 })
     }
 
@@ -56,28 +45,12 @@ export async function POST(req: Request) {
       data: { credits: { decrement: 1 } }
     })
 
-    // 1. Upload original video to Supabase
-    const fileName = `${userId}/${Date.now()}-${file.name}`
-    const { data, error } = await supabaseAdmin
-      .storage
-      .from('upload')
-      .upload(fileName, file)
-
-    if (error) {
-      console.error('Supabase upload error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    if (!data?.path) {
-      return NextResponse.json({ error: "Upload failed: No file path" }, { status: 500 })
-    }
-
-    // 2. Create job record
+    // Create job record
     const job = await db.job.create({
       data: {
-        fileName: file.name,
-        filePath: data.path,
-        fileSize: file.size,
+        fileName,
+        filePath,
+        fileSize,
         status: 'pending',
         user: {
           connect: {
@@ -90,7 +63,7 @@ export async function POST(req: Request) {
     // Get the request URL to determine the origin
     const origin = new URL(req.url).origin
 
-    // 3. Start processing
+    // Start processing
     try {
       const processResponse = await fetch(`${origin}/api/process`, {
         method: 'POST',

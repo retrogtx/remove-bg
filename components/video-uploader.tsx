@@ -13,6 +13,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { uploadToSupabase } from '@/lib/upload-to-supabase'
+import { useSession } from "next-auth/react"
 
 interface Job {
   id: string
@@ -44,6 +46,7 @@ interface Props {
 }
 
 export function VideoUploader({ remainingCredits }: Props) {
+  const { data: session } = useSession()
   console.log('VideoUploader mounted with credits:', remainingCredits)
 
   const [isDragging, setIsDragging] = useState(false)
@@ -108,9 +111,16 @@ export function VideoUploader({ remainingCredits }: Props) {
 
   const handleUpload = async () => {
     if (!uploadedVideo) return
+    if (!session?.user?.id) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload videos",
+      })
+      return
+    }
 
-    console.log('Upload attempted with credits:', remainingCredits)
-    console.log('Credit check result:', remainingCredits < 1)
+    console.log('Session user:', session.user) // Debug log
+    console.log('Attempting upload as user:', session.user.id) // Debug log
 
     if (remainingCredits < 1) {
       toast({
@@ -144,14 +154,23 @@ export function VideoUploader({ remainingCredits }: Props) {
         return
       }
 
-      const formData = new FormData()
-      formData.append("file", uploadedVideo)
-      formData.append("outputType", outputType)
+      // Upload to Supabase first
+      const filePath = await uploadToSupabase(uploadedVideo, session.user.id)
 
+      // Then send metadata to API
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
-        credentials: 'include'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          fileName: uploadedVideo.name,
+          filePath,
+          fileSize: uploadedVideo.size,
+          fileType: uploadedVideo.type,
+          outputType
+        })
       })
 
       if (!uploadResponse.ok) {
