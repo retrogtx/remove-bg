@@ -9,4 +9,14 @@ export interface Job {
   error: string | null
   createdAt: string
   updatedAt: string
+}
+
+export type JobUpdate = {
+  type: 'job_update'
+  job: {
+    id: string
+    fileName: string
+    status: 'pending' | 'processing' | 'completed' | 'failed'
+    processedPath?: string | null
+  }
 } 
