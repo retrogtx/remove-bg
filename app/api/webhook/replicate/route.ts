@@ -1,10 +1,4 @@
 import { ReadableStreamDefaultController } from 'stream/web'
-
-declare global {
-  /* eslint-disable-next-line no-var */
-  var eventControllers: Map<string, ReadableStreamDefaultController> | undefined
-}
-
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { db } from "@/prisma"
 import { NextResponse } from "next/server"
@@ -83,7 +77,7 @@ export async function POST(req: Request) {
       })
 
       // Notify clients through SSE
-      globalThis.eventControllers?.forEach((controller: ReadableStreamDefaultController) => {
+      global.eventControllers?.forEach((controller: ReadableStreamDefaultController) => {
         controller.enqueue(
           `data: ${JSON.stringify({
             type: 'job_update',

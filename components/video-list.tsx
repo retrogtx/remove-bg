@@ -1,38 +1,48 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { supabase } from '@/lib/supabase'
-
-interface JobsResponse {
-  jobs: Job[]
-  metadata: {
-    total: number
-    page: number
-    totalPages: number
-  }
-}
-
-type Job = {
-  id: string
-  fileName: string
-  filePath: string
-  processedPath: string | null
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  error: string | null
-}
+import type { Job, JobUpdate } from '@/lib/types'
+import { useEffect } from "react"
 
 export function VideoList() {
-  const { data, isLoading } = useQuery<JobsResponse>({
+  const queryClient = useQueryClient()
+
+  const { data: jobs, isLoading } = useQuery<Job[]>({
     queryKey: ['jobs'],
     queryFn: async () => {
       const response = await fetch('/api/jobs?page=1&limit=10')
       if (!response.ok) throw new Error('Failed to fetch jobs')
-      return response.json()
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+      const data = await response.json()
+      return data.jobs
+    }
   })
+
+  // Set up SSE listener
+  useEffect(() => {
+    const events = new EventSource('/api/jobs/sse')
+    
+    events.onmessage = (event) => {
+      const data = JSON.parse(event.data) as JobUpdate
+      if (data.type === 'job_update') {
+        // Update React Query cache
+        queryClient.setQueryData(['jobs'], (oldJobs: Job[] = []) => 
+          oldJobs.map(job => 
+            job.id === data.job.id ? { ...job, ...data.job } : job
+          )
+        )
+      }
+    }
+
+    events.onerror = (error) => {
+      console.error('SSE error:', error)
+      events.close()
+    }
+
+    return () => events.close()
+  }, [queryClient])
 
   const getVideoUrl = (path: string) => {
     if (!path) return ''
@@ -51,13 +61,13 @@ export function VideoList() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Loading your videos...</p>
         </div>
-      ) : !data?.jobs?.length ? (
+      ) : !jobs?.length ? (
         <div className="text-center py-10">
           <p className="text-muted-foreground">No videos found. Upload one to get started!</p>
         </div>
       ) : (
         <div className="grid gap-4">
-          {data.jobs.map(job => (
+          {jobs.map(job => (
             <div key={job.id} className="border rounded-lg p-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">{job.fileName}</h3>
