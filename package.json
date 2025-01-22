@@ -35,7 +35,8 @@
     "replicate": "^1.0.1",
     "standardwebhooks": "^1.0.0",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vercel": "^39.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",
