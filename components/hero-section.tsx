@@ -1,6 +1,7 @@
 "use client";
 
 import SignIn from '@/components/sign-in';
+import Script from 'next/script';
 import { motion } from 'framer-motion';
 
 export function HeroSection() {
@@ -53,7 +54,7 @@ export function HeroSection() {
       title="Scene AI"
     ></iframe>
   </div>
-  <script src="https://player.vimeo.com/api/player.js"></script>
+  <Script src="https://player.vimeo.com/api/player.js" strategy="lazyOnload" />
 </div>
       </motion.div>
     </div>
