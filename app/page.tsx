@@ -2,6 +2,7 @@ import { HeroSection } from '@/components/hero-section'
 import { HowItWorks } from '@/components/how-it-works'
 import { PricingSection } from '@/components/pricing-section'
 import { StatsSection } from '@/components/stats-section'
+import { FaqSection } from '@/components/faq-section'
 import { Footer } from '@/components/footer'
 import { Navbar } from '@/components/navbar'
 
@@ -12,6 +13,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <StatsSection />
+        <FaqSection />
         <HowItWorks />
         <PricingSection />
       </main>
