@@ -37,24 +37,24 @@ export function HeroSection() {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <div className="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500/10 to-purple-500/10 shadow-2xl border border-gray-800">
-          {/* Replace the video element with the Vimeo embed */}
-          <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
-            <iframe
-              src="https://player.vimeo.com/video/1049911658?badge=0&autopause=0&player_id=0&app_id=58479"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-              }}
-              title="Scene AI"
-            ></iframe>
-          </div>
-          <script src="https://player.vimeo.com/api/player.js"></script>
-        </div>
+  {/* Replace the video element with the Vimeo embed */}
+  <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+    <iframe
+      src="https://player.vimeo.com/video/1049911658?autoplay=1&muted=1&badge=0&autopause=0&player_id=0&app_id=58479"
+      frameBorder="0"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+      }}
+      title="Scene AI"
+    ></iframe>
+  </div>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+</div>
       </motion.div>
     </div>
   );
