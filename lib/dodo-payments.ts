@@ -9,7 +9,7 @@ export const createPayment = async (params: {
   metadata: Record<string, string>;
   payment_link?: boolean;
 }) => {
-  const response = await fetch('https://test.dodopayments.com/payments', {
+  const response = await fetch('https://live.dodopayments.com/payments', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.DODO_PAYMENTS_API_KEY}`,
@@ -37,7 +37,7 @@ export const createPayment = async (params: {
 }
 
 export const getPaymentStatus = async (paymentId: string) => {
-  const response = await fetch(`https://test.dodopayments.com/payments/${paymentId}`, {
+  const response = await fetch(`https://live.dodopayments.com/payments/${paymentId}`, {
     headers: {
       'Authorization': `Bearer ${process.env.DODO_PAYMENTS_API_KEY}`,
       'Content-Type': 'application/json'
